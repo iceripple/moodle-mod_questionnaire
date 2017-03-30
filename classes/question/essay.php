@@ -33,7 +33,7 @@ class essay extends base {
 
     public function __construct($id = 0, $question = null, $context = null, $params = array()) {
         parent::__construct($id, $question, $context, $params);
-        
+
         // Split off responsetemplate -if any- from the question.
         $textar = explode(RESPONSETEMPLATE_START, $this->content);
         if (array_key_exists(1, $textar)) {
@@ -42,7 +42,7 @@ class essay extends base {
             $this->responsetemplate= array('text' => str_replace(RESPONSETEMPLATE_END, '', $textar[1]), 'format' => FORMAT_HTML);
         }
     }
-    
+
     protected function responseclass() {
         return '\\mod_questionnaire\\response\\text';
     }
@@ -121,7 +121,7 @@ class essay extends base {
         $mform = parent::form_question_text($mform, $context);
 
         $editoroptions = array('maxfiles' => 0, 'trusttext' => true, 'context' => $context);
-        $mform->addElement('editor', 'responsetemplate', get_string('responsetemplate', 'theme_elevate'), null, $editoroptions);
+        $mform->addElement('editor', 'responsetemplate', get_string('responsetemplate', 'questionnaire'), null, $editoroptions);
         $mform->setType('template', PARAM_RAW);
 
         return $mform;
@@ -141,13 +141,4 @@ class essay extends base {
         return parent::form_preprocess_data($formdata);
     }
 
-//     public function questionstart_survey_display($qnum, $formdata='') {
-//         // Split off the template -if any- from the question.
-//         $textar = explode(CONTENTSPLITSTR, $this->content);
-//         if (array_key_exists(1, $textar)) {
-//             $this->content = $textar[0];
-//             $this->responsetemplate = chop($textar[1], '-->');
-//         }
-//         parent::questionstart_survey_display($qnum, $formdata);
-//     }
 }
