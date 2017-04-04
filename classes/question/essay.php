@@ -103,7 +103,7 @@ class essay extends base {
 
     protected function form_precise(\MoodleQuickForm $mform, $helptext = '') {
         $choices = array();
-        for ($lines = 5; $lines <= 40; $lines += 5) {
+        for ($lines = 5; $lines <= 100; $lines += 5) {
             $choices[$lines] = get_string('nlines', 'questionnaire', $lines);
         }
         $mform->addElement('select', 'length', get_string('responsefieldlines', 'questionnaire'), $choices);
