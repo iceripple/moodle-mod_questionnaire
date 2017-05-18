@@ -135,4 +135,10 @@ class essay extends base {
         return parent::form_preprocess_data($formdata);
     }
 
+    public function pre_update() {
+        if (!empty($this->responsetemplate['text'])) {
+            $this->content .= RESPONSETEMPLATE_START . $this->responsetemplate['text'] . RESPONSETEMPLATE_END;
+        }
+    }
+
 }
