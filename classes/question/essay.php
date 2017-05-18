@@ -124,12 +124,12 @@ class essay extends base {
     protected function form_preprocess_data($formdata) {
         // Remove any old responsetemplate
         $contentsplit = explode(RESPONSETEMPLATE_START, $formdata->content['text']);
-        $content = $content[0];
+        $content = $contentsplit[0];
         $template = trim($formdata->responsetemplate['text']);
         if (empty($template) || preg_match('/<p>\s*?<\/p>/', $template)) {
             $formdata->content['text'] = $content;
         } else {
-            $formdata->content['text'] .= $content. RESPONSETEMPLATE_START . $template . RESPONSETEMPLATE_END;
+            $formdata->content['text'] = $content. RESPONSETEMPLATE_START . $template . RESPONSETEMPLATE_END;
         }
 
         return parent::form_preprocess_data($formdata);
