@@ -3115,10 +3115,16 @@ class questionnaire {
                 }
                 if ($question->id == $movequestion->id) {
                     $movequestion->position = $movetopos;
+                    if (method_exists($movequestion, 'pre_update')) {
+                        $movequestion->pre_update();
+                    }
                     $DB->update_record("questionnaire_question", $movequestion);
                     continue;
                 }
                 $question->position = $index;
+                if (method_exists($question, 'pre_update')) {
+                    $question->pre_update();
+                }
                 $DB->update_record("questionnaire_question", $question);
                 $index++;
             }
