@@ -17,15 +17,20 @@
 /**
  * Print the form to add or edit a questionnaire-instance
  *
+ * @package mod_questionnaire
+ * @copyright  2016 Mike Churchward (mike.churchward@poetgroup.org)
  * @author Joseph Rezeau (based on Quiz by Tim Hunt)
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @package questionnaire
  */
+
+namespace mod_questionnaire;
+
+defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/formslib.php');
 require_once($CFG->dirroot.'/mod/questionnaire/lib.php');
 
-class mod_questionnaire_feedback_form extends moodleform {
+class feedback_form extends \moodleform {
 
     protected $_feedbacks;
 
@@ -121,7 +126,7 @@ class mod_questionnaire_feedback_form extends moodleform {
         // Buttons.
         if ($currentsection < $feedbacksections) {
             $currentsection ++;
-            $sectionsnav = ' ('.$currentsection.'/'.$feedbacksections.')';
+            $sectionsnav = '('.$currentsection.'/'.$feedbacksections.')';
             $buttonarray[] = &$mform->createElement('submit', 'submitbutton',
                 get_string('feedbacknextsection', 'questionnaire', $sectionsnav));
         } else {

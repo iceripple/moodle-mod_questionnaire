@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-global $SESSION, $CFG;
 require_once("../../config.php");
 require_once($CFG->dirroot.'/mod/questionnaire/questionnaire.class.php');
 
@@ -116,10 +115,9 @@ $SESSION->questionnaire->current_tab = 'allreport';
 // Get all responses for further use in viewbyresp and deleteall etc.
 // All participants.
 $params = array('survey_id' => $sid, 'complete' => 'y');
-$respsallparticipants = $DB->get_records('questionnaire_response', $params, 'id', 'id,survey_id,submitted,username');
+$respsallparticipants = $DB->get_records('questionnaire_response', $params, 'id', 'id,survey_id,submitted,userid');
 $SESSION->questionnaire->numrespsallparticipants = count ($respsallparticipants);
 $SESSION->questionnaire->numselectedresps = $SESSION->questionnaire->numrespsallparticipants;
-$castsql = $DB->sql_cast_char2int('r.username');
 
 // Available group modes (0 = no groups; 1 = separate groups; 2 = visible groups).
 $groupmode = groups_get_activity_groupmode($cm, $course);
@@ -197,7 +195,7 @@ switch ($action) {
             $id = $questionnaire->survey;
             notify ("questionnaire->survey = /$id/");
             print_error('surveynotexists', 'questionnaire');
-        } else if ($questionnaire->survey->owner != $course->id) {
+        } else if ($questionnaire->survey->courseid != $course->id) {
             print_error('surveyowner', 'questionnaire');
         } else if (!$rid || !is_numeric($rid)) {
             print_error('invalidresponse', 'questionnaire');
@@ -206,14 +204,14 @@ switch ($action) {
         }
 
         $ruser = false;
-        if (is_numeric($resp->username)) {
-            if ($user = $DB->get_record('user', array('id' => $resp->username))) {
+        if (!empty($resp->userid)) {
+            if ($user = $DB->get_record('user', ['id' => $resp->userid])) {
                 $ruser = fullname($user);
             } else {
                 $ruser = '- '.get_string('unknown', 'questionnaire').' -';
             }
         } else {
-            $ruser = $resp->username;
+            $ruser = $resp->userid;
         }
 
         // Print the page header.
@@ -289,7 +287,7 @@ switch ($action) {
 
         if (empty($questionnaire->survey)) {
             print_error('surveynotexists', 'questionnaire');
-        } else if ($questionnaire->survey->owner != $course->id) {
+        } else if ($questionnaire->survey->courseid != $course->id) {
             print_error('surveyowner', 'questionnaire');
         } else if (!$rid || !is_numeric($rid)) {
             print_error('invalidresponse', 'questionnaire');
@@ -309,7 +307,7 @@ switch ($action) {
             $params = array('objectid' => $questionnaire->survey->id,
                             'context' => $questionnaire->context,
                             'courseid' => $questionnaire->course->id,
-                            'relateduserid' => $response->username);
+                            'relateduserid' => $response->userid);
             $event = \mod_questionnaire\event\response_deleted::create($params);
             $event->trigger();
 
@@ -317,14 +315,14 @@ switch ($action) {
         } else {
             if ($questionnaire->respondenttype == 'anonymous') {
                     $ruser = '- '.get_string('anonymous', 'questionnaire').' -';
-            } else if (is_numeric($response->username)) {
-                if ($user = $DB->get_record('user', array('id' => $response->username))) {
+            } else if (!empty($response->userid)) {
+                if ($user = $DB->get_record('user', ['id' => $response->userid])) {
                     $ruser = fullname($user);
                 } else {
                     $ruser = '- '.get_string('unknown', 'questionnaire').' -';
                 }
             } else {
-                $ruser = $response->username;
+                $ruser = $response->userid;
             }
             error (get_string('couldnotdelresp', 'questionnaire').$rid.get_string('by', 'questionnaire').$ruser.'?',
                    $CFG->wwwroot.'/mod/questionnaire/report.php?action=vresp&amp;sid='.$sid.'&amp;&amp;instance='.
@@ -338,7 +336,7 @@ switch ($action) {
 
         if (empty($questionnaire->survey)) {
             print_error('surveynotexists', 'questionnaire');
-        } else if ($questionnaire->survey->owner != $course->id) {
+        } else if ($questionnaire->survey->courseid != $course->id) {
             print_error('surveyowner', 'questionnaire');
         }
 
@@ -349,12 +347,12 @@ switch ($action) {
                     $resps = $respsallparticipants;
                     break;
                 default:     // Members of a specific group.
-                    $sql = "SELECT r.id, r.survey_id, r.submitted, r.username
+                    $sql = "SELECT r.id, r.survey_id, r.submitted, r.userid
                         FROM {questionnaire_response} r,
                             {groups_members} gm
                          WHERE r.survey_id = ? AND
                            r.complete ='y' AND
-                           gm.groupid = ? AND " . $castsql . " = gm.userid
+                           gm.groupid = ? AND r.userid = gm.userid
                         ORDER BY r.id";
                     if (!($resps = $DB->get_records_sql($sql, array($sid, $currentgroupid)))) {
                         $resps = array();
@@ -369,14 +367,14 @@ switch ($action) {
                 } else {
                     $resp = $DB->get_record('questionnaire_response', array('id' => $rid));
                 }
-                if (is_numeric($resp->username)) {
-                    if ($user = $DB->get_record('user', array('id' => $resp->username))) {
+                if (!empty($resp->userid)) {
+                    if ($user = $DB->get_record('user', ['id' => $resp->userid])) {
                         $ruser = fullname($user);
                     } else {
                         $ruser = '- '.get_string('unknown', 'questionnaire').' -';
                     }
                 } else {
-                    $ruser = $resp->username;
+                    $ruser = $resp->userid;
                 }
             }
         } else {
@@ -540,7 +538,7 @@ switch ($action) {
             foreach ($questionnairegroups as $group) {
                 $sql = 'SELECT COUNT(r.id) ' .
                        'FROM {questionnaire_response} r ' .
-                       'INNER JOIN {groups_members} gm ON ' . $castsql . ' = gm.userid ' .
+                       'INNER JOIN {groups_members} gm ON r.userid = gm.userid ' .
                        'WHERE r.survey_id = ? AND r.complete = ? AND gm.groupid = ?';
                 $respscount = $DB->count_records_sql($sql, array($sid, 'y', $group->id));
                 $thisgroupname = groups_get_group_name($group->id);
@@ -555,10 +553,8 @@ switch ($action) {
                             '<\/option>/', '', $groupselect);
                 }
             }
-            $respinfo .= isset($groupselect) ? $groupselect : '';
+            $respinfo .= isset($groupselect) ? ($groupselect . ' ') : '';
             $currentgroupid = groups_get_activity_group($cm);
-        } else {
-            $respinfo .= '<br />';
         }
         if ($currentgroupid > 0) {
              $groupname = get_string('group').': <strong>'.groups_get_group_name($currentgroupid).'</strong>';
@@ -575,7 +571,7 @@ switch ($action) {
                 default:     // Members of a specific group.
                     $sql = 'SELECT r.id, gm.id as groupid ' .
                            'FROM {questionnaire_response} r ' .
-                           'INNER JOIN {groups_members} gm ON ' . $castsql . ' = gm.userid ' .
+                           'INNER JOIN {groups_members} gm ON r.userid = gm.userid ' .
                            'WHERE r.survey_id = ? AND r.complete = ? AND gm.groupid = ?';
                     if (!($resps = $DB->get_records_sql($sql, array($sid, 'y', $currentgroupid)))) {
                         $resps = '';
@@ -590,8 +586,7 @@ switch ($action) {
         if (!empty($resps)) {
             // NOTE: response_analysis uses $resps to get the id's of the responses only.
             // Need to figure out what this function does.
-            $feedbackmessages = $questionnaire->response_analysis($rid = 0, $resps, $compare = false,
-                $isgroupmember = false, $allresponses = true, $currentgroupid);
+            $feedbackmessages = $questionnaire->response_analysis(0, $resps, false, false, true, $currentgroupid);
 
             if ($feedbackmessages) {
                 $msgout = '';
@@ -616,7 +611,7 @@ switch ($action) {
         $respinfo .= $questionnaire->renderer->help_icon('orderresponses', 'questionnaire');
         $questionnaire->page->add_to_page('respondentinfo', $respinfo);
 
-        $ret = $questionnaire->survey_results(1, 1, '', '', '', $uid = false, $currentgroupid, $sort);
+        $ret = $questionnaire->survey_results(1, 1, '', '', '', false, $currentgroupid, $sort);
 
         echo $questionnaire->renderer->render($questionnaire->page);
 
@@ -629,7 +624,7 @@ switch ($action) {
     default:
         if (empty($questionnaire->survey)) {
             print_error('surveynotexists', 'questionnaire');
-        } else if ($questionnaire->survey->owner != $course->id) {
+        } else if ($questionnaire->survey->courseid != $course->id) {
             print_error('surveyowner', 'questionnaire');
         }
         $ruser = false;
@@ -667,12 +662,12 @@ switch ($action) {
                         $resps = $respsallparticipants;
                         break;
                     default:     // Members of a specific group.
-                        $sql = 'SELECT r.id, r.survey_id, r.submitted, r.username ' .
+                        $sql = 'SELECT r.id, r.survey_id, r.submitted, r.userid ' .
                                'FROM {questionnaire_response} r ' .
-                               'INNER JOIN {groups_members} gm ON ' . $castsql . ' = gm.userid ' .
+                               'INNER JOIN {groups_members} gm ON r.userid = gm.userid ' .
                                'WHERE r.survey_id = ? AND r.complete = ? AND gm.groupid = ? ' .
                                'ORDER BY r.id';
-                        $resps = $DB->get_records_sql($sql, array($sid, 'y', $currentgroupid));
+                        $resps = $DB->get_records_sql($sql, [$sid, 'y', $currentgroupid]);
                 }
                 if (empty($resps)) {
                     $noresponses = true;
@@ -681,16 +676,16 @@ switch ($action) {
                         $resp = current($resps);
                         $rid = $resp->id;
                     } else {
-                        $resp = $DB->get_record('questionnaire_response', array('id' => $rid));
+                        $resp = $DB->get_record('questionnaire_response', ['id' => $rid]);
                     }
-                    if (is_numeric($resp->username)) {
-                        if ($user = $DB->get_record('user', array('id' => $resp->username))) {
+                    if (!empty($resp->userid)) {
+                        if ($user = $DB->get_record('user', ['id' => $resp->userid])) {
                             $ruser = fullname($user);
                         } else {
                             $ruser = '- '.get_string('unknown', 'questionnaire').' -';
                         }
                     } else {
-                        $ruser = $resp->username;
+                        $ruser = $resp->userid;
                     }
                 }
             } else {
@@ -738,8 +733,7 @@ switch ($action) {
             }
             $questionnaire->survey_results_navbar_alpha($rid, $currentgroupid, $cm, $byresponse);
             if (!$byresponse) { // Show respondents individual responses.
-                $questionnaire->view_response($rid, $referer = '', $blankquestionnaire = false, $resps, $compare = true,
-                    $isgroupmember = true, $allresponses = false, $currentgroupid);
+                $questionnaire->view_response($rid, '', false, $resps, true, true, false, $currentgroupid);
             }
         }
 

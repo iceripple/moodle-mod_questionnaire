@@ -26,7 +26,22 @@ namespace mod_questionnaire\question;
 defined('MOODLE_INTERNAL') || die();
 use \html_writer;
 
+define('RESPONSETEMPLATE_START', '<!-- Response template : ');
+define('RESPONSETEMPLATE_END', ' /Response template-->');
+
 class essay extends base {
+
+    public function __construct($id = 0, $question = null, $context = null, $params = array()) {
+        parent::__construct($id, $question, $context, $params);
+
+        // Split off responsetemplate -if any- from the question.
+        $textar = explode(RESPONSETEMPLATE_START, $this->content);
+        if (array_key_exists(1, $textar)) {
+            $this->content = $textar[0];
+            $this->responsetemplate = str_replace(RESPONSETEMPLATE_END, '', $textar[1]);
+            $this->responsetemplate= array('text' => str_replace(RESPONSETEMPLATE_END, '', $textar[1]), 'format' => FORMAT_HTML);
+        }
+    }
 
     protected function responseclass() {
         return '\\mod_questionnaire\\response\\text';
@@ -56,7 +71,7 @@ class essay extends base {
         if (isset($data->{'q'.$this->id})) {
             $value = $data->{'q'.$this->id};
         } else {
-            $value = '';
+            $value = isset($this->responsetemplate['text'])? $this->responsetemplate['text'] : '';
         }
         if ($canusehtmleditor) {
             $editor = editors_get_preferred_editor();
@@ -94,11 +109,42 @@ class essay extends base {
 
     protected function form_precise(\MoodleQuickForm $mform, $helptext = '') {
         $choices = array();
-        for ($lines = 5; $lines <= 40; $lines += 5) {
+        for ($lines = 5; $lines <= 100; $lines += 5) {
             $choices[$lines] = get_string('nlines', 'questionnaire', $lines);
         }
         $mform->addElement('select', 'length', get_string('responsefieldlines', 'questionnaire'), $choices);
         $mform->setType('length', PARAM_INT);
         return $mform;
     }
+
+    protected function form_question_text(\MoodleQuickForm $mform, $context) {
+        $mform = parent::form_question_text($mform, $context);
+
+        $editoroptions = array('maxfiles' => 0, 'trusttext' => true, 'context' => $context);
+        $mform->addElement('editor', 'responsetemplate', get_string('responsetemplate', 'questionnaire'), null, $editoroptions);
+        $mform->setType('template', PARAM_RAW);
+
+        return $mform;
+    }
+
+    protected function form_preprocess_data($formdata) {
+        // Remove any old responsetemplate
+        $contentsplit = explode(RESPONSETEMPLATE_START, $formdata->content['text']);
+        $content = $contentsplit[0];
+        $template = trim($formdata->responsetemplate['text']);
+        if (empty($template) || preg_match('/<p>\s*?<\/p>/', $template)) {
+            $formdata->content['text'] = $content;
+        } else {
+            $formdata->content['text'] = $content. RESPONSETEMPLATE_START . $template . RESPONSETEMPLATE_END;
+        }
+
+        return parent::form_preprocess_data($formdata);
+    }
+
+    public function pre_update() {
+        if (!empty($this->responsetemplate['text'])) {
+            $this->content .= RESPONSETEMPLATE_START . $this->responsetemplate['text'] . RESPONSETEMPLATE_END;
+        }
+    }
+
 }

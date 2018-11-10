@@ -15,11 +15,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package moodlecore
- * @subpackage backup-moodle2
- * @copyright 2010 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package mod_questionnaire
+ * @copyright  2016 Mike Churchward (mike.churchward@poetgroup.org)
+ * @author     Mike Churchward
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Define all the backup steps that will be used by the backup_questionnaire_activity_task
@@ -38,26 +40,30 @@ class backup_questionnaire_activity_structure_step extends backup_activity_struc
         // Define each element separated.
         $questionnaire = new backup_nested_element('questionnaire', array('id'), array(
             'course', 'name', 'intro', 'introformat', 'qtype',
-            'respondenttype', 'resp_eligible', 'resp_view', 'opendate',
+            'respondenttype', 'resp_eligible', 'resp_view', 'notifications', 'opendate',
             'closedate', 'resume', 'navigate', 'grade', 'sid', 'timemodified', 'completionsubmit', 'autonum'));
 
         $surveys = new backup_nested_element('surveys');
 
         $survey = new backup_nested_element('survey', array('id'), array(
-            'name', 'owner', 'realm', 'status', 'title', 'email', 'subtitle',
+            'name', 'courseid', 'realm', 'status', 'title', 'email', 'subtitle',
             'info', 'theme', 'thanks_page', 'thank_head', 'thank_body', 'feedbacksections',
             'feedbacknotes', 'feedbackscores', 'chart_type'));
 
         $questions = new backup_nested_element('questions');
 
-        $question = new backup_nested_element('question', array('id'), array(
-            'survey_id', 'name', 'type_id', 'result_id', 'length', 'precise',
-            'position', 'content', 'required', 'deleted', 'dependquestion', 'dependchoice'));
+        $question = new backup_nested_element('question', array('id'), array('survey_id', 'name', 'type_id', 'result_id',
+            'length', 'precise', 'position', 'content', 'required', 'deleted'));
 
         $questchoices = new backup_nested_element('quest_choices');
 
         $questchoice = new backup_nested_element('quest_choice', array('id'), array(
             'question_id', 'content', 'value'));
+
+        $questdependencies = new backup_nested_element('quest_dependencies');
+
+        $questdependency = new backup_nested_element('quest_dependency', array('id'), array(
+            'dependquestionid', 'dependchoiceid', 'dependlogic', 'questionid', 'surveyid', 'dependandor'));
 
         $fbsections = new backup_nested_element('fb_sections');
 
@@ -77,7 +83,7 @@ class backup_questionnaire_activity_structure_step extends backup_activity_struc
         $responses = new backup_nested_element('responses');
 
         $response = new backup_nested_element('response', array('id'), array(
-            'survey_id', 'submitted', 'complete', 'grade', 'username'));
+            'survey_id', 'submitted', 'complete', 'grade', 'userid'));
 
         $responsebools = new backup_nested_element('response_bools');
 
@@ -102,7 +108,7 @@ class backup_questionnaire_activity_structure_step extends backup_activity_struc
         $responseranks = new backup_nested_element('response_ranks');
 
         $responserank = new backup_nested_element('response_rank', array('id'), array(
-            'response_id', 'question_id', 'choice_id', 'rank'));
+            'response_id', 'question_id', 'choice_id', 'rankvalue'));
 
         $responsesingles = new backup_nested_element('response_singles');
 
@@ -123,6 +129,10 @@ class backup_questionnaire_activity_structure_step extends backup_activity_struc
 
         $question->add_child($questchoices);
         $questchoices->add_child($questchoice);
+
+        $question->add_child($questdependencies);
+        $questdependencies->add_child($questdependency);
+
         $survey->add_child($fbsections);
         $fbsections->add_child($fbsection);
 
@@ -164,7 +174,7 @@ class backup_questionnaire_activity_structure_step extends backup_activity_struc
         $currentquestionnaire = $DB->get_record("questionnaire", array ("id" => $qid));
         $currentsurvey = $DB->get_record("questionnaire_survey", array ("id" => $currentquestionnaire->sid));
         $haspublic = false;
-        if ($currentsurvey->realm == 'public' && $currentsurvey->owner != $currentquestionnaire->course) {
+        if ($currentsurvey->realm == 'public' && $currentsurvey->courseid != $currentquestionnaire->course) {
             $haspublic = true;
         }
 
@@ -175,6 +185,7 @@ class backup_questionnaire_activity_structure_step extends backup_activity_struc
             $fbsection->set_source_table('questionnaire_fb_sections', array('survey_id' => backup::VAR_PARENTID));
             $feedback->set_source_table('questionnaire_feedback', array('section_id' => backup::VAR_PARENTID));
             $questchoice->set_source_table('questionnaire_quest_choice', array('question_id' => backup::VAR_PARENTID));
+            $questdependency->set_source_table('questionnaire_dependency', array('questionid' => backup::VAR_PARENTID));
 
             // All the rest of elements only happen if we are including user info.
             if ($userinfo) {

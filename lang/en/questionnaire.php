@@ -15,11 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings for component 'questionnaire', language 'en', branch 'MOODLE_24_STABLE'
+ * Strings for component 'questionnaire', language 'en'
  *
- * @package    mod
- * @subpackage quiz
- * @copyright  1999 onwards Martin Dougiamas  {@link http://moodle.com}
+ * @package    mod_questionnaire
+ * @copyright  2018 onward Mike Churchward (mike.churchward@poetopensource.org)
+ * @author     Mike Churchward
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -37,6 +37,10 @@ $string['all'] = 'All';
 $string['alreadyfilled'] = 'You have already filled out this questionnaire for us{$a}. Thank you.';
 $string['andaveragevalues'] = 'and average values';
 $string['anonymous'] = 'Anonymous';
+$string['answergiven'] = 'This answer given';
+$string['answernotgiven'] = 'This answer not given';
+$string['answer'] = 'Answer';
+$string['answers'] = 'Answers';
 $string['answerquestions'] = 'Answer the questions...';
 $string['attempted'] = 'This questionnaire has been submitted.';
 $string['attemptstillinprogress'] = 'In progress. Saved on:';
@@ -83,6 +87,7 @@ $string['closeson'] = 'Questionnaire closes on {$a}';
 $string['closedate_help'] = 'You can specify a date to close the questionnaire here. Check the check box, and select the date and time you want.
  Users will not be able to fill out the questionnaire after that date. If this is not selected, it will never be closed.';
 $string['completionsubmit'] = 'Student must submit this questionnaire to complete it';
+$string['condition'] = 'Condition';
 $string['confalts'] = '- OR - <br />Confirmation page';
 $string['configusergraph'] = 'Display charts for "Personality Test" feedback';
 $string['configusergraphlong'] = 'Use the <a href="http://www.rgraph.net/">Rgraph</a> library to display "Personality Test" feedback charts.';
@@ -115,10 +120,12 @@ $string['deletedisabled'] = 'This item cannot be deleted';
 $string['deletedresp'] = 'Deleted Response';
 $string['deleteresp'] = 'Delete this Response';
 $string['deletingresp'] = 'Deleting Response';
+$string['dependencies'] = 'Dependencies';
 $string['dependquestion'] = 'Parent Question';
 $string['dependquestion_help'] = 'You can select a parent question and a choice option for this question. A child question will only be displayed
                 to the student if its parent question and parent choice have been previously selected.';
 $string['dependquestion_link'] = 'mod/questionnaire/questions#Parent_Question';
+$string['directwarnings'] = 'Direct dependencies to this question will be removed. This will affect:';
 $string['displaymethod'] = 'Display method not defined for question.';
 $string['download'] = 'Download';
 $string['downloadtextformat'] = 'Download in text format';
@@ -225,6 +232,7 @@ $string['incorrectquestionnaire'] = 'Questionnaire is incorrect';
 $string['invalidresponse'] = 'Invalid response specified.';
 $string['invalidresponserecord'] = 'Invalid response record specified.';
 $string['invalidsurveyid'] = 'Invalid questionnaire ID.';
+$string['indirectwarnings'] = 'This list shows the indirect dependent questions and the remaining dependencies for direct dependent questions:';
 $string['kindofratescale'] = 'Type of rate scale';
 $string['kindofratescale_help'] = 'Right-click on the More Help link below.';
 $string['kindofratescale_link'] = 'mod/questionnaire/questions#Type_of_rate_scale';
@@ -233,6 +241,7 @@ $string['length'] = 'Length';
 $string['managequestions'] = 'Manage questions';
 $string['managequestions_help'] = 'In the Manage questions section of the Edit Questions page, you can conduct a number of operations on a Questionnaire\'s questions.';
 $string['managequestions_link'] = 'mod/questionnaire/questions#Manage_questions';
+$string['mandatory'] = 'Mandatory - All these dependencies must be fulfilled.';
 $string['maxdigitsallowed'] = 'Max. digits allowed';
 $string['maxdigitsallowed_help'] = 'Use **Max. digits allowed** to set a limit to the number of characters entered for a Numeric question. Note that the
 decimal point also counts as one character!';
@@ -247,6 +256,7 @@ $string['maxtextlength'] = 'Max. text length';
 $string['maxtextlength_help'] = 'For the Text Box question type, enter the Input Box length and the Maximum text length of text to be entered by respondent.
 Default values are 20 characters for the Input Box width and 25 characters for the maximum length of text entered.';
 $string['messageprovider:message'] = 'Questionnaire reminder';
+$string['messageprovider:notification'] = 'Questionnaire submission';
 $string['minforcedresponses'] = 'Min. forced responses';
 $string['minforcedresponses_help'] = 'Use these parameters to force respondent to tick a minimum of **Min.** boxes and a maximum of **Max.** check boxes. To
 force an exact number of check boxes to be ticked, set **Min.** and **Max.** to the same value. If only a min or a max value is desired, just leave the other
@@ -288,8 +298,14 @@ $string['notapplicablecolumn'] = 'N/A column';
 $string['notavail'] = 'This questionnaire is no longer available. Ask your teacher to delete it.';
 $string['noteligible'] = 'You are not eligible to take this questionnaire.';
 $string['notemplatesurveys'] = 'No template questionnaires.';
+$string['notificationfull'] = 'Full submission';
+$string['notifications'] = 'Send submission notifications';
+$string['notificationsimple'] = 'Notification only';
+$string['notifications_help'] = 'Notify roles with the "mod/questionnaire:submissionnotification" capability when a submission is made.';
+$string['notifications_link'] = 'mod/questionnaire/mod#Submission_Notifications';
 $string['notopen'] = 'This questionnaire will not open until {$a}.';
 $string['notrequired'] = 'Response is not required';
+$string['notset'] = 'not set';
 $string['not_started'] = 'not started';
 $string['nousersselected'] = 'No users selected';
 $string['num'] = '#';
@@ -307,6 +323,7 @@ $string['opendate'] = 'Use Open Date';
 $string['opendate_help'] = 'You can specify a date to open the questionnaire here. Check the check box, and select the date and time you want.
  Users will not be able to fill out the questionnaire before that date. If this is not selected, it will be open immediately.';
 $string['option'] = 'option {$a}';
+$string['optional'] = 'Optional - At least one of this dependencies has to be fulfilled.';
 $string['optionalname'] = 'Question Name';
 $string['optionalname_help'] = 'The Question Name is only used when you export responses to CSV/Excel format.
  If you never export to CSV, then you needn\'t worry about Question names at all.
@@ -338,6 +355,7 @@ $string['overviewnumrespvw1'] = 'response';
 $string['owner'] = 'Owner';
 $string['page'] = 'Page';
 $string['pageof'] = 'Page {$a->page} of {$a->totpages}';
+$string['parent'] = 'Parent';
 $string['participant'] = 'Participant';
 $string['pleasecomplete'] = 'Please complete this choice.';
 $string['pluginadministration'] = 'Questionnaire administration';
@@ -354,6 +372,57 @@ $string['print'] = 'Print this Response';
 $string['printblank'] = 'Print Blank';
 $string['printblanktooltip'] = 'Opens printer-friendly window with blank Questionnaire';
 $string['printtooltip'] = 'Opens printer-friendly window with current Response';
+
+$string['privacy:metadata:questionnaire_attempts'] = 'Details about each submission of a questionnaire by a user.';
+$string['privacy:metadata:questionnaire_attempts:userid'] = 'The ID of the user for this attempt.';
+$string['privacy:metadata:questionnaire_attempts:rid'] = 'The ID of the user\'s response record for this attempt.';
+$string['privacy:metadata:questionnaire_attempts:qid'] = 'The ID of the questionnaire record for this attempt.';
+$string['privacy:metadata:questionnaire_attempts:timemodified'] = 'The timestamp for the latest submission of this attempt.';
+
+$string['privacy:metadata:questionnaire_response'] = 'A response in progress or submitted';
+$string['privacy:metadata:questionnaire_response:userid'] = 'The ID of the user for this response.';
+$string['privacy:metadata:questionnaire_response:survey_id'] = 'The ID of the survey record for this response.';
+$string['privacy:metadata:questionnaire_response:complete'] = 'The response completion status.';
+$string['privacy:metadata:questionnaire_response:grade'] = 'The grade for this response.';
+$string['privacy:metadata:questionnaire_response:submitted'] = 'The timestamp for the most recent save for this response.';
+
+$string['privacy:metadata:questionnaire_response_bool'] = 'A boolean (yes/no) question response.';
+$string['privacy:metadata:questionnaire_response_bool:response_id'] = 'The ID of the response record for this response.';
+$string['privacy:metadata:questionnaire_response_bool:question_id'] = 'The ID of the question record for this response.';
+$string['privacy:metadata:questionnaire_response_bool:choice_id'] = 'The specific boolean answer.';
+
+$string['privacy:metadata:questionnaire_response_date'] = 'A date question response.';
+$string['privacy:metadata:questionnaire_response_date:response_id'] = 'The ID of the response record for this response.';
+$string['privacy:metadata:questionnaire_response_date:question_id'] = 'The ID of the question record for this response.';
+$string['privacy:metadata:questionnaire_response_date:response'] = 'The specific date answer.';
+
+$string['privacy:metadata:questionnaire_response_other'] = 'An \'other\' choice text response.';
+$string['privacy:metadata:questionnaire_response_other:response_id'] = 'The ID of the response record for this response.';
+$string['privacy:metadata:questionnaire_response_other:question_id'] = 'The ID of the question record for this response.';
+$string['privacy:metadata:questionnaire_response_other:choice_id'] = 'The ID of the choice record for this response.';
+$string['privacy:metadata:questionnaire_response_other:response'] = 'The specific text answer.';
+
+$string['privacy:metadata:questionnaire_response_rank'] = 'A rank question response.';
+$string['privacy:metadata:questionnaire_response_rank:response_id'] = 'The ID of the response record for this response.';
+$string['privacy:metadata:questionnaire_response_rank:question_id'] = 'The ID of the question record for this response.';
+$string['privacy:metadata:questionnaire_response_rank:choice_id'] = 'The ID of the choice record for this response.';
+$string['privacy:metadata:questionnaire_response_rank:rankvalue'] = 'The specific rank answer.';
+
+$string['privacy:metadata:questionnaire_response_text'] = 'A text question response.';
+$string['privacy:metadata:questionnaire_response_text:response_id'] = 'The ID of the response record for this response.';
+$string['privacy:metadata:questionnaire_response_text:question_id'] = 'The ID of the question record for this response.';
+$string['privacy:metadata:questionnaire_response_text:response'] = 'The specific text answer.';
+
+$string['privacy:metadata:questionnaire_resp_multiple'] = 'A multiple choice question response.';
+$string['privacy:metadata:questionnaire_resp_multiple:response_id'] = 'The ID of the response record for this response.';
+$string['privacy:metadata:questionnaire_resp_multiple:question_id'] = 'The ID of the question record for this response.';
+$string['privacy:metadata:questionnaire_resp_multiple:choice_id'] = 'The ID of a choice record for this response.';
+
+$string['privacy:metadata:questionnaire_resp_single'] = 'A single choice question response.';
+$string['privacy:metadata:questionnaire_resp_single:response_id'] = 'The ID of the response record for this response.';
+$string['privacy:metadata:questionnaire_resp_single:question_id'] = 'The ID of the question record for this response.';
+$string['privacy:metadata:questionnaire_resp_single:choice_id'] = 'The ID of the choice record for this response.';
+
 $string['private'] = 'Private';
 $string['public'] = 'Public';
 $string['publiccopy'] = 'Copy:';
@@ -379,6 +448,7 @@ $string['questionnaire:printblank'] = 'Print blank questionnaire';
 $string['questionnaire:readallresponseanytime'] = 'Read all responses any time';
 $string['questionnaire:readallresponses'] = 'Read response summaries, subject to open times';
 $string['questionnaire:readownresponses'] = 'Read own responses';
+$string['questionnaire:submissionnotification'] = 'Receive notification for each submission';
 $string['questionnaire:submit'] = 'Complete and submit a questionnaire';
 $string['questionnaire:view'] = 'View a questionnaire';
 $string['questionnaire:viewsingleresponse'] = 'View complete individual responses';
@@ -434,6 +504,7 @@ $string['responsefieldlines'] = 'Input box size';
 $string['responseformat'] = 'Response format';
 $string['responseoptions'] = 'Response options';
 $string['responses'] = 'Responses';
+$string['responsetemplate'] = 'Response template';
 $string['responseview'] = 'Students can view ALL responses';
 $string['responseview_help'] = 'You can specify who can see the responses of all respondents to submitted questionnaires (general statistics tables).';
 $string['responseview_link'] = 'mod/questionnaire/mod#Response_viewing';
@@ -470,12 +541,18 @@ $string['send_message_to'] = 'Send message to:';
 $string['sendemail_help'] = 'Sends a copy of each submission to the specified address or addresses.
 You can provide more than one address by separating them with commas.
 Leave blank for no email backup.';
+$string['set'] = 'set';
 $string['settings'] = 'Settings';
 $string['settingssaved'] = 'Settings saved';
 $string['show_nonrespondents'] = 'Non-respondents';
 $string['started'] = 'started';
 $string['strfdate'] = '%d/%m/%Y';
 $string['strfdateformatcsv'] = 'd/m/Y H:i:s';
+$string['submissionnotificationhtmlanon'] = 'There is a new <a href="{$a->submissionurl}">submission</a> to the "{$a->name}" questionnaire.';
+$string['submissionnotificationhtmluser'] = '<a href="{$a->profileurl}">{$a->username}</a> has a new <a href="{$a->submissionurl}">submission</a> to the "{$a->name}" questionnaire in the course "{$a->coursename}".';
+$string['submissionnotificationsubject'] = 'New questionnaire submission';
+$string['submissionnotificationtextanon'] = 'There is a new submission ({$a->submissionurl}) to the "{$a->name}" questionnaire.';
+$string['submissionnotificationtextuser'] = '{$a->username} ({$a->profileurl}) has a new submission ({$a->submissionurl}) to the "{$a->name}" questionnaire in the course "{$a->coursename}".';
 $string['submitoptions'] = 'Submission options';
 $string['submitpreview'] = 'Submit preview';
 $string['submitpreviewcorrect'] = 'This submission would be accepted as correctly filled in.';

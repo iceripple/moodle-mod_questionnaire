@@ -25,7 +25,7 @@
 namespace mod_questionnaire\question;
 defined('MOODLE_INTERNAL') || die();
 
-class numeric extends base {
+class numerical extends base {
 
     /**
      * Constructor. Use to set any default properties.
@@ -110,7 +110,7 @@ class numeric extends base {
         $choice->name = 'q'.$this->id;
         $choice->maxlength = $this->length;
         $choice->value = (isset($data->{'q'.$this->id}) ? $data->{'q'.$this->id} : '');
-        $choice->id = $this->type . $this->id;
+        $choice->id = self::qtypename($this->type_id) . $this->id;
         $questiontags->qelements = new \stdClass();
         $questiontags->qelements->choice = $choice;
         return $questiontags;
