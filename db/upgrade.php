@@ -694,6 +694,49 @@ function xmldb_questionnaire_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2017111101, 'questionnaire');
     }
 
+    // Converting to new dependency system.
+    if ($oldversion < 2017111103) {
+
+        // If these fields exist, possibly due to incorrect creation from a new install (see CONTRIB-7300), remove them.
+        $table = new xmldb_table('questionnaire_question');
+        $field1 = new xmldb_field('dependquestion');
+        $field2 = new xmldb_field('dependchoice');
+        if ($dbman->field_exists($table, $field1)) {
+            $dbman->drop_field($table, $field1);
+        }
+        if ($dbman->field_exists($table, $field2)) {
+            $dbman->drop_field($table, $field2);
+        }
+
+        // Questionnaire savepoint reached.
+        upgrade_mod_savepoint(true, 2017111103, 'questionnaire');
+    }
+
+    // Rename the mdl_questionnaire_response_rank.rank field as it is reserved in MySQL as of 8.0.2.
+    if ($oldversion < 2017111106) {
+        // Change the name from username to userid.
+        // Due to MDL-63310, the 'rename_field' function cannot be used for MySQL. Create special code for this. This can be
+        // replaced when MDL-63310 is fixed and released.
+        if ($DB->get_dbfamily() !== 'mysql') {
+            $table = new xmldb_table('questionnaire_response_rank');
+            $field = new xmldb_field('rank', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null, null, '0', 'choice_id');
+            if ($dbman->field_exists($table, $field)) {
+                $dbman->rename_field($table, $field, 'rankvalue');
+            }
+        } else {
+            if ($dbman->field_exists('questionnaire_response_rank', 'rank')) {
+                $rankoldfieldname = $DB->get_manager()->generator->getEncQuoted('rank');
+                $ranknewfieldname = $DB->get_manager()->generator->getEncQuoted('rankvalue');
+                $sql = 'ALTER TABLE {questionnaire_response_rank} ' .
+                    'CHANGE ' . $rankoldfieldname . ' ' . $ranknewfieldname . ' BIGINT(11) NOT NULL';
+                $DB->execute($sql);
+            }
+        }
+
+        // Questionnaire savepoint reached.
+        upgrade_mod_savepoint(true, 2017111106, 'questionnaire');
+    }
+
     return $result;
 }
 
